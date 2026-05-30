@@ -1,0 +1,14 @@
+pycache/
+*.pyc
+
+venv/
+.venv/
+
+mlruns/
+
+models/*.pkl
+
+.idea/
+.vscode/
+
+.DS_Store
