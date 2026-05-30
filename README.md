@@ -43,7 +43,7 @@ pip install -r requirements.txt
 
 python pipeline.py
 
-## Запуск через Docker
+## :globe_with_meridians: Запуск через Docker
 
 docker build -t churn-pipeline .
 
