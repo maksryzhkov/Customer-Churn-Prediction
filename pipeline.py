@@ -90,9 +90,6 @@ def build_preprocessor(df, target):
 
 
 def train_model():
-    print("Текущая директория:", os.getcwd())
-    print("Путь для сохранения графиков:", os.path.abspath("plots"))
-
     config = load_config()
 
     start_time = time.time()
