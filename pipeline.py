@@ -167,9 +167,17 @@ def train_model():
         os.makedirs("plots", exist_ok=True)
 
         # ROC-кривая
-        RocCurveDisplay.from_estimator(pipeline, X_test, y_test)
-        plt.title("ROC-кривая модели")
-        plt.savefig("plots/roc_curve.png")
+        RocCurveDisplay.from_estimator(
+            pipeline,
+            X_test,
+            y_test
+        )
+        plt.title(
+            f"ROC-кривая (AUC = {roc_auc:.3f})"
+        )
+        plt.savefig(
+            "plots/roc_curve.png"
+        )
         plt.close()
         print("ROC-кривая сохранена")
 

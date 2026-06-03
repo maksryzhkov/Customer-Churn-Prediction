@@ -28,7 +28,7 @@ jobs:
       - name: Build Docker image
         run: docker build -t rostelecom-churn-pipeline .
       - name: Run container (smoke test)
-        run: docker run --rm rostelecom-churn-pipeline python -c "import pipeline; print('OK')"
+        run: docker run --rm rostelecom-churn-pipeline
       - name: Log in to Docker Hub
         if: github.ref == 'refs/heads/main'
         uses: docker/login-action@v3
