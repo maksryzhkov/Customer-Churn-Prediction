@@ -200,7 +200,11 @@ def train_model():
         print("ROC-кривая сохранена")
 
         # Матрица ошибок
-        ConfusionMatrixDisplay.from_estimator(pipeline, X_test, y_test)
+        ConfusionMatrixDisplay.from_estimator(
+            pipeline,
+            X_test,
+            y_test
+        )
         plt.title("Матрица ошибок")
         plt.savefig("plots/confusion_matrix.png")
         plt.close()
