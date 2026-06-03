@@ -5,6 +5,9 @@ import joblib
 
 import pandas as pd
 
+import matplotlib.pyplot as plt
+from sklearn.metrics import RocCurveDisplay, ConfusionMatrixDisplay
+
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 
@@ -86,6 +89,9 @@ def build_preprocessor(df, target):
 
 
 def train_model():
+    print("Текущая директория:", os.getcwd())
+    print("Путь для сохранения графиков:", os.path.abspath("plots"))
+
     config = load_config()
 
     start_time = time.time()
@@ -157,6 +163,43 @@ def train_model():
         y_test,
         y_prob
     )
+    try:
+        os.makedirs("plots", exist_ok=True)
+
+        # ROC-кривая
+        RocCurveDisplay.from_estimator(pipeline, X_test, y_test)
+        plt.title("ROC-кривая модели")
+        plt.savefig("plots/roc_curve.png")
+        plt.close()
+        print("ROC-кривая сохранена")
+
+        # Матрица ошибок
+        ConfusionMatrixDisplay.from_estimator(pipeline, X_test, y_test)
+        plt.title("Матрица ошибок")
+        plt.savefig("plots/confusion_matrix.png")
+        plt.close()
+        print("Матрица ошибок сохранена")
+
+        # Важность признаков
+        trained_model = pipeline.named_steps["model"]
+        preprocessor = pipeline.named_steps["preprocessor"]
+        feature_names = preprocessor.get_feature_names_out()
+
+        importances = trained_model.feature_importances_
+        indices = importances.argsort()[-15:]
+
+        plt.figure(figsize=(10, 6))
+        plt.barh(range(len(indices)), importances[indices])
+        plt.yticks(range(len(indices)), [feature_names[i] for i in indices])
+        plt.xlabel("Важность")
+        plt.title("Топ-15 важных признаков")
+        plt.tight_layout()
+        plt.savefig("plots/feature_importance.png")
+        plt.close()
+        print("Важность признаков сохранена")
+
+    except Exception as e:
+        print(f"Ошибка при сохранении графиков: {e}")
 
     # mlflow.set_experiment(
     #     "rostelecom_churn_prediction"
