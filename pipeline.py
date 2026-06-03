@@ -2,7 +2,8 @@ import os
 import time
 import yaml
 import joblib
-
+import json
+from datetime import datetime
 import pandas as pd
 
 import matplotlib.pyplot as plt
@@ -18,7 +19,7 @@ from sklearn.preprocessing import (
     StandardScaler,
 )
 
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, GridSearchCV
 
 from sklearn.ensemble import RandomForestClassifier
 
@@ -136,9 +137,29 @@ def train_model():
         ("model", model)
     ])
 
-    pipeline.fit(
+    param_grid = {
+        "model__n_estimators": [100, 200, 300],
+        "model__max_depth": [4, 6, 8]
+    }
+
+    grid_search = GridSearchCV(
+        pipeline,
+        param_grid=param_grid,
+        cv=3,
+        scoring="roc_auc",
+        n_jobs=-1
+    )
+
+    grid_search.fit(
         X_train,
         y_train
+    )
+
+    pipeline = grid_search.best_estimator_
+
+    print(
+        "Лучшие параметры:",
+        grid_search.best_params_
     )
 
     y_pred = pipeline.predict(
@@ -314,6 +335,49 @@ def train_model():
 
     print(
         f"ROC-AUC={roc_auc:.3f}"
+    )
+
+    metrics = {
+        "timestamp": datetime.now().strftime(
+            "%Y-%m-%d %H:%M:%S"
+        ),
+        "accuracy": round(
+            accuracy,
+            3
+        ),
+        "f1_score": round(
+            f1,
+            3
+        ),
+        "roc_auc": round(
+            roc_auc,
+            3
+        ),
+        "training_time_sec": round(
+            time.time() - start_time,
+            2
+        )
+    }
+
+    os.makedirs(
+        "monitoring",
+        exist_ok=True
+    )
+
+    with open(
+            "monitoring/metrics.json",
+            "w",
+            encoding="utf-8"
+    ) as file:
+        json.dump(
+            metrics,
+            file,
+            indent=4,
+            ensure_ascii=False
+        )
+
+    print(
+        "Метрики сохранены: monitoring/metrics.json"
     )
 
     return (
